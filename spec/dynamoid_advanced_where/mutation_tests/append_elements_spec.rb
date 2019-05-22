@@ -7,8 +7,8 @@ RSpec.describe "Upserting" do
       new_class(table_name: 'appending_with_range_test') do
         field :simple_string
         field :numb_a, :number
-        field :test_set, :set, of: :strings
-        field :test_arr, :array, of: :integers
+        field :test_set, :set, of: :string
+        field :test_arr, :array, of: :integer
 
         self.range_key = :numb_a
       end
@@ -36,8 +36,8 @@ RSpec.describe "Upserting" do
     let(:klass) do
       new_class(table_name: 'appending_without_range_test') do
         field :simple_string
-        field :test_set, :set, of: :strings
-        field :test_arr, :array, of: :integers
+        field :test_set, :set, of: :string
+        field :test_arr, :array, of: :integer
       end
     end
 

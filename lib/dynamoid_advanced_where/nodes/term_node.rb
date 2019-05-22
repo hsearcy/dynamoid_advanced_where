@@ -45,6 +45,18 @@ module DynamoidAdvancedWhere
       end
       alias == eq
 
+      def includes?(other_value)
+        IncludesNode.validate_source_node(attribute_config, other_value)
+
+        self.child_nodes = create_subnode(
+          IncludesNode,
+          term_node: self,
+          value: other_value
+        )
+
+        self
+      end
+
       def greater_than(other_value)
         klass = GreaterThanNode.determine_subtype(
           attribute_config,

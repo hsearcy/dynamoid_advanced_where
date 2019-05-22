@@ -133,6 +133,7 @@ module DynamoidAdvancedWhere
       end
     end
 
+
     def increment_field_updates
       return {} if _increments.empty?
 
@@ -198,10 +199,7 @@ module DynamoidAdvancedWhere
         {
           expression_attribute_names: { "##{prefix}" => field_name },
           expression_attribute_values: {
-            ":#{prefix}" => klass.dump_field(
-              value,
-              klass.attributes[field_name]
-            )
+            ":#{prefix}" => dump(value, klass.attributes[field_name])
           }
         }
       ]
@@ -222,6 +220,10 @@ module DynamoidAdvancedWhere
         query_builder: query_builder,
         klass: klass,
       )
+    end
+
+    def dump(value, config)
+      Dynamoid::Dumping.dump_field(value, config)
     end
   end
 end

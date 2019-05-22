@@ -2,9 +2,9 @@ require 'spec_helper'
 
 RSpec.describe "Basic value equality matching" do
   let(:klass) do
-    new_class(table_name: 'equality_spec', table_opts: {key: :bar} ) do
+    new_class(table_name: "equality_spec", table_opts: {key: :bar} ) do
       field :simple_string
-      field :bool, :boolean
+      field :bool, :boolean, store_as_native_boolean: false
       field :native_bool, :boolean, store_as_native_boolean: true
     end
   end

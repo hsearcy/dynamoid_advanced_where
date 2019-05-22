@@ -71,6 +71,17 @@ Valid on field types: `numeric`, and `datetime` (only when stored as a number)
 #### Example
 `where{ foo < 123 }` and `where{ foo < Date.today }`
 
+### Includes
+This operator may be used to check if:
+
+* A string contains another substring
+* A set of String or Integers contain a given value
+
+Valid on field types: `string`, or `set` of `String` / `Integer`
+
+#### Example
+`where{ foo.includes?(123) }` and `where{ foo.includes?('foo') }`
+
 ### Boolean Operators
 
 | Logical Operator | Behavior      | Example

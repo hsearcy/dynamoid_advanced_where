@@ -7,6 +7,7 @@ require_relative './nodes/or_node'
 require_relative './nodes/equality_node'
 require_relative './nodes/boolean_equality_node'
 require_relative './nodes/exists_node'
+require_relative './nodes/includes'
 
 require_relative './nodes/greater_than_node'
 require_relative './nodes/date_attr/greater_than_node'
