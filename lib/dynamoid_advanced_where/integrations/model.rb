@@ -7,6 +7,13 @@ module DynamoidAdvancedWhere
       extend ActiveSupport::Concern
 
       class_methods do
+        def advanced_where(&blk)
+          DynamoidAdvancedWhere::QueryBuilder.new(
+            klass: self,
+            &blk
+          )
+        end
+
         def batch_update
           where{}.batch_update
         end
