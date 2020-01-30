@@ -4,7 +4,7 @@ Dynamoid Advanced where provides a more advanced query structure for selecting,
 and updating records. This is very much a work in progress and functionality is
 being added as it is needed.
 
-## Installation
+## Installation 
 
 Add this line to your application's Gemfile:
 
