@@ -1,5 +1,5 @@
 PATH
-  remote: .
+  remote: ..
   specs:
     dynamoid-advanced-where (0.1.0)
       dynamoid (>= 3.2, < 4)
@@ -102,13 +102,13 @@ GEM
 
 PLATFORMS
   ruby
-  x86_64-darwin-17
   x86_64-darwin-18
 
 DEPENDENCIES
   appraisal
   bundle-audit
   bundler (>= 1.16)
+  dynamoid (~> 3.4.0)
   dynamoid-advanced-where!
   fasterer
   overcommit

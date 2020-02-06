@@ -3,24 +3,40 @@
 module DynamoidAdvancedWhere
   module Nodes
     class AndNode < BaseNode
-      attr_accessor :child_nodes, :negated
+      include Concerns::Negatable
+      attr_accessor :child_nodes
 
-      def to_condition_expression
+      def initialize(*child_nodes)
+        self.child_nodes = child_nodes.freeze
+        freeze
+      end
+
+      def to_expression
         return if child_nodes.empty?
 
-        "#{@negated ? 'NOT ' : ''}(#{child_nodes.map(&:to_condition_expression).join(') and (')})"
+        "(#{child_nodes.map(&:to_expression).join(') and (')})"
       end
 
-      def negate!
-        @negated = !@negated
+      def expression_attribute_names
+        child_nodes.map(&:expression_attribute_names).inject({}, &:merge!)
       end
 
-      def negated?
-        !!@negated
+      def expression_attribute_values
+        child_nodes.map(&:expression_attribute_values).inject({}, &:merge!)
       end
 
-      def dup
-        super.tap { |n| n.negated = @negated }
+      def and(other_value)
+        AndNode.new(other_value, *child_nodes)
+      end
+      alias & and
+    end
+
+    module Concerns
+      module SupportsLogicalAnd
+        def and(other_value)
+          AndNode.new(self, other_value)
+        end
+        alias & and
       end
     end
   end

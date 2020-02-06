@@ -1,26 +1,46 @@
+# frozen_string_literal: true
+
+require 'forwardable'
+require_relative './null_node'
+
 module DynamoidAdvancedWhere
   module Nodes
     class RootNode < BaseNode
-      def evaluate_block(blk)
-        self.child_nodes = [
-          self.instance_eval(&blk)
-        ].compact
+      extend Forwardable
+      attr_accessor :klass, :child_node
+
+      def initialize(klass:, &blk)
+        self.klass = klass
+        evaluate_block(blk) if blk
+        self.child_node ||= NullNode.new
+        freeze
       end
 
-      def to_condition_expression
-        child_nodes.first.to_condition_expression unless child_nodes.empty?
-      end
-
-      def combine_with!(other_root_node, combinator)
-        new_child = create_subnode(combinator).tap do |new_node|
-          new_node.child_nodes = (
-            self.child_nodes + other_root_node.child_nodes
-          ).compact
+      def method_missing(method, *args, &blk)
+        if allowed_field?(method)
+          FieldNode.create_node(attr_config: klass.attributes[method], field_path: method)
+        else
+          super
         end
+      end
 
-        new_child.flatten_tree!
+      def respond_to_missing?(method, _i)
+        allowed_field?(method)
+      end
 
-        self.child_nodes = [new_child]
+      def allowed_field?(method)
+        klass.attributes.key?(method.to_sym)
+      end
+
+      private
+
+      def evaluate_block(blk)
+        self.child_node = if blk.arity.zero?
+                            Dynamoid.logger.warn 'Using DynamoidAdvancedWhere builder without an argument is now deprecated'
+                            instance_eval(&blk)
+                          else
+                            blk.call(self)
+                       end
       end
     end
   end
