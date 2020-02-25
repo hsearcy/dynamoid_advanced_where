@@ -3,7 +3,7 @@ require_relative './filter_builder'
 module DynamoidAdvancedWhere
   class QueryMaterializer
     include Enumerable
-    attr_accessor :query_builder, :limit, :start_key
+    attr_accessor :query_builder, :limit, :start_key, :last_evaluated_key
 
     delegate :klass, to: :query_builder
     delegate :table_name, to: :klass
@@ -19,6 +19,18 @@ module DynamoidAdvancedWhere
 
     def all
       each.to_a
+    end
+
+    def record_limit(num)
+      @limit = { limit: num }
+      result = PartialResult.new(each.to_a)
+      result.last_evaluated_key = @last_evaluated_key
+      result
+    end
+
+    def start(key_hash)
+      @start_key = { exclusive_start_key: key_hash }
+      self
     end
 
     def each(&blk)
@@ -45,16 +57,6 @@ module DynamoidAdvancedWhere
       end
     end
 
-    def record_limit(num)
-      @limit = { limit: num }
-      self
-    end
-
-    def start(key_hash)
-      @start_key = { exclusive_start_key: key_hash}
-      self
-    end
-
     def each_via_scan
       query = {
         table_name: table_name
@@ -63,6 +65,7 @@ module DynamoidAdvancedWhere
       results = client.scan(query)
 
       if results.items
+        @last_evaluated_key = results.last_evaluated_key
         results.items.each do |item|
           yield klass.from_database(item.symbolize_keys)
         end
@@ -81,4 +84,8 @@ module DynamoidAdvancedWhere
       Dynamoid.adapter.client
     end
   end
+end
+
+class PartialResult < Array
+  attr_accessor :last_evaluated_key
 end
