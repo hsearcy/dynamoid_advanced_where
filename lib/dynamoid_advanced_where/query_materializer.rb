@@ -3,8 +3,7 @@ require_relative './filter_builder'
 module DynamoidAdvancedWhere
   class QueryMaterializer
     include Enumerable
-    attr_accessor :query_builder
-
+    attr_accessor :query_builder, :limit, :start_key
 
     delegate :klass, to: :query_builder
     delegate :table_name, to: :klass
@@ -14,6 +13,8 @@ module DynamoidAdvancedWhere
 
     def initialize(query_builder:)
       self.query_builder = query_builder
+      self.limit = {}
+      self.start_key = {}
     end
 
     def all
@@ -44,10 +45,20 @@ module DynamoidAdvancedWhere
       end
     end
 
+    def record_limit(num)
+      @limit = { limit: num }
+      self
+    end
+
+    def start(key_hash)
+      @start_key = { exclusive_start_key: key_hash}
+      self
+    end
+
     def each_via_scan
       query = {
         table_name: table_name
-      }.merge(filter_builder.to_scan_filter)
+      }.merge(filter_builder.to_scan_filter).merge(limit).merge(start_key)
 
       results = client.scan(query)
 
